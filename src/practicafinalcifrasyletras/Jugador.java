@@ -9,32 +9,43 @@ public class Jugador {
     static Cifras cifras = new Cifras();
     static Letras letras = new Letras();
     static leerFicheros leer = new leerFicheros();
+    private String nombre;
+    private int puntuacion;
+
+    public Jugador(String nombre) {
+        this.nombre = nombre;
+        this.puntuacion = 0;
+    }
 
     public static String nombre() {
         String nombre = "";
         char caracter;
-        System.out.println("introduce tu nombre: ");
+
+        System.out.println("Introduce tu nombre finalizado en punto:");
+
         caracter = lt.llegirCaracter();
-        nombre = nombre + caracter;
+        while (caracter != '.') {
+            nombre = nombre + caracter;
+            caracter = lt.llegirCaracter();
+        }
+
         return nombre;
     }
 
-    public static int NumeroDePartidas() {
-        int partidas;
-        System.out.println("cuantas partidas quieres jugar: ");
-        partidas = lt.llegirEnter();
-
-        if (partidas % 2 != 0 || partidas < 0) {
-            System.out.println("ha se ser un positivo numero par");
-            NumeroDePartidas();
-        } else if (partidas == 0) {
-            System.out.println("muchas gracias por jugar!!");
-        }
-
-        return partidas;
+    public void calcularPuntuacion() throws Exception {
+        int puntos = JuegoCifras() + JuegoLetras();
+        this.puntuacion = puntos;
     }
 
-    public static void main(String[] agrs) throws Exception {
+    public String getNombre() {
+        return nombre;
+    }
+
+    public int getPuntuacion() {
+        return puntuacion;
+    }
+
+    public static void main(String[] args) throws Exception {
         JuegoCifras();
     }
 
@@ -118,86 +129,74 @@ public class Jugador {
         System.out.println();
 
         boolean seguir = true;
-
         while (seguir && numerosJugegos.length > 1) {
-            System.out.println("introduce un numero: ");
-            num1 = lt.llegirEnter();
-            System.out.println();
-            boolean existe1 = cifras.Existe(num1, numerosJugegos);
 
-            if (existe1 == true) {
-                System.out.println("elije un segundo numero: ");
-                num2 = lt.llegirEnter();
-                boolean existe2 = cifras.Existe(num2, numerosJugegos);
-                if (existe2 == true) {
-                    System.out.println("elije una operacion:   " + " + " + " - " + " * " + " / " + " = ");
-                    operacion = lt.llegirCaracter();
-                    if (operacion != '=') {
+            num1 = cifras.pedirNumeroValido(numerosJugegos);
 
-                        switch (operacion) {
-                            case '+':
-                                resultado = cifras.Suma(num1, num2);
-                                numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
-                                reescribir(numerosJugegos);
-                                break;
+            num2 = cifras.pedirNumeroValido(numerosJugegos);
 
-                            case '-':
-                                resultado = cifras.resta(num1, num2);
-                                if (resultado == -1) {
-                                    System.out.println("no se puede realizar la operacion");
+            System.out.println("elije una operacion:   " + " + " + " - " + " * " + " / " + " = ");
+            operacion = lt.llegirCaracter();
 
-                                } else {
-                                    numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
-                                    reescribir(numerosJugegos);
-                                }
+            if (operacion != '=') {
+                switch (operacion) {
+                    case '+':
+                        resultado = cifras.Suma(num1, num2);
+                        numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
+                        reescribir(numerosJugegos);
+                        break;
 
-                                break;
-
-                            case '*':
-                                resultado = cifras.multiplicacion(num1, num2);
-                                numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
-                                reescribir(numerosJugegos);
-
-                                break;
-
-                            case '/':
-                                resultado = cifras.division(num1, num2);
-                                if (resultado == -1) {
-                                    System.out.println("no se puede realizar la operacion");
-
-                                } else {
-                                    reescribir(numerosJugegos);
-                                }
-
-                                break;
-
-                            default:
-                                System.out.println("no es una operacion valida");
-                                break;
-                        }
-
-                    } else {
-
-                        System.out.println("introduce el resultado:  ");
-                        num1 = lt.llegirEnter();
-                        if (existe1) {
-                            puntacionCifras = cifras.puntuacion(num1, numInicial);
-                            System.out.println("puntuacion: " + puntacionCifras);
-                            seguir = false;
+                    case '-':
+                        resultado = cifras.resta(num1, num2);
+                        if (resultado == -1) {
+                            System.out.println("no se puede realizar la operacion");
 
                         } else {
-                            System.out.println("no se puede realizar la operacion");
-                            System.out.println("vuelve a intentarlo");
-
+                            numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
+                            reescribir(numerosJugegos);
                         }
-                    }
+
+                        break;
+
+                    case '*':
+                        resultado = cifras.multiplicacion(num1, num2);
+                        numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
+                        reescribir(numerosJugegos);
+
+                        break;
+
+                    case '/':
+                        resultado = cifras.division(num1, num2);
+                        if (resultado == -1) {
+                            System.out.println("no se puede realizar la operacion");
+
+                        } else {
+                            reescribir(numerosJugegos);
+                        }
+
+                        break;
+
+                    default:
+                        System.out.println("no es una operacion valida");
+                        break;
+                }
+
+            } else {
+
+                System.out.println("introduce el resultado:  ");
+                int num = lt.llegirEnter();
+                boolean existe = cifras.Existe(num, numerosJugegos);
+
+                if (existe) {
+                    puntacionCifras = cifras.puntuacion(num1, numInicial);
+                    System.out.println("puntuacion: " + puntacionCifras);
+                    seguir = false;
 
                 } else {
-                    System.out.println("no existe vuelve a intentarlo");
+                    System.out.println("no se puede realizar la operacion");
+                    System.out.println("vuelve a intentarlo");
 
                 }
-            } else {
-                System.out.println("no existe vuelve a intentarlo");
             }
 
         }
@@ -217,8 +216,9 @@ public class Jugador {
         System.out.print("Numeros posibles: ");
         for (int i = 0; i < numerosJugegos.length; i++) {
             System.out.print(numerosJugegos[i] + " ");
-            System.out.println();
+
         }
+        System.out.println();
 
     }
 
