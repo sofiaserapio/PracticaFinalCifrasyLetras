@@ -1,3 +1,7 @@
+/*
+clase que se encarga de controlar todo lo relacionado a las cifras: el objetivo, 
+los numeros posibles, las operaciones, si es posible realizarlas y su puntuación 
+ */
 package practicafinalcifrasyletras;
 
 import java.util.Random;
@@ -7,6 +11,7 @@ public class Cifras {
     static LT lt = new LT();
     static leerFicheros leer = new leerFicheros();
 
+    // escoge de forma aleatororia 6 numeros de la bolsa de cifras 
     public static int[] NumerosJuego() {
         int[] NuemrosFichero = leer.leerCifras();
         int[] NuemrosJuego = new int[6];
@@ -18,6 +23,7 @@ public class Cifras {
         }
         return NuemrosJuego;
     }
+// comprueba que el numero introducido este en los numeros proporcionados
 
     public static boolean Existe(int numero, int[] num) {
         boolean esPosible = false;
@@ -29,6 +35,7 @@ public class Cifras {
 
         return esPosible;
     }
+// pedir los numeros por pantalla 
 
     public static int pedirNumeroValido(int[] numerosJuegos) {
 
@@ -56,11 +63,13 @@ public class Cifras {
 
         return numero;
     }
+// operaciones 
 
     public static int Suma(int num1, int num2) {
         int suma = num1 + num2;
         return suma;
     }
+// controlamos que el resultado sea positivo 
 
     public static int resta(int num1, int num2) {
 
@@ -77,6 +86,7 @@ public class Cifras {
 
         return mult;
     }
+// controlamos que no se divida entre 0 y que la division sea exacta 
 
     public static int division(int num1, int num2) {
 
@@ -91,6 +101,7 @@ public class Cifras {
 
         return division;
     }
+// sustituimos el resultado y elimimamos los numeros utilizados 
 
     public static int[] sustituir(int resultado, int num1, int num2, int[] num) {
         int[] nuevo = new int[num.length - 1];
@@ -115,6 +126,7 @@ public class Cifras {
 
         return nuevo;
     }
+// puntuación 
 
     public static int puntuacion(int resultado, int Numaleatorio) {
         int puntuacion = 0;
@@ -122,7 +134,7 @@ public class Cifras {
 
         int diferencia = valorAbsoluto(r);
 
-        if (resultado==Numaleatorio) {
+        if (resultado == Numaleatorio) {
             puntuacion = 10;
         } else if (diferencia >= 1 && diferencia <= 5) {
             puntuacion = 7;
@@ -134,6 +146,7 @@ public class Cifras {
 
         return puntuacion;
     }
+// puntuacion final 
 
     public static int puntuacionNumeros(int puntos, int puntuacionfinal) {
 
@@ -141,6 +154,7 @@ public class Cifras {
 
         return puntuacionfinal;
     }
+// metodo para cañcular el valor absoluto 
 
     public static int valorAbsoluto(int x) {
         if (x < 0) {
@@ -150,8 +164,9 @@ public class Cifras {
         }
 
     }
+// elegimos el objetivo( un numero entero entre 100 y 999)
 
-    public static int Numeroaleatorio(){
+    public static int Numeroaleatorio() {
         Random random = new Random();
         int num = random.nextInt(100, 999);
 

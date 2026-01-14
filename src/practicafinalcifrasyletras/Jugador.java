@@ -1,5 +1,5 @@
 /*
-
+clase que controla todos los atributos de un jugador, el juego letras, el juego cifras, el nombre y su puntyuuación 
  */
 package practicafinalcifrasyletras;
 
@@ -11,12 +11,16 @@ public class Jugador {
     static leerFicheros leer = new leerFicheros();
     private String nombre;
     private int puntuacion;
+    private int puntosLetras;
+    private int puntosNumeros;
 
     public Jugador(String nombre) {
         this.nombre = nombre;
         this.puntuacion = 0;
+        this.puntosLetras = 0;
+        this.puntosNumeros = 0;
     }
-
+// pide el nombre 
     public static String nombre() {
         String nombre = "";
         char caracter;
@@ -32,11 +36,6 @@ public class Jugador {
         return nombre;
     }
 
-    public void calcularPuntuacion() throws Exception {
-        int puntos = JuegoCifras() + JuegoLetras();
-        this.puntuacion = puntos;
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -45,13 +44,20 @@ public class Jugador {
         return puntuacion;
     }
 
-    public static void main(String[] args) throws Exception {
-        JuegoCifras();
+    public int getPuntuacionLetras() {
+        return puntosLetras;
     }
 
-    public static int JuegoLetras() throws Exception {
+    public int getPuntuacionNumeros() {
+        return puntosNumeros;
+    }
 
-        int puntuacionLetras = 0;
+    public void Calcularapuntuacion() {
+        int puntos = getPuntuacionNumeros() + getPuntuacionLetras();
+        this.puntuacion = puntos;
+    }
+
+    public void JuegoLetras() throws Exception {
 
         // Generas una vez las letras del turno
         char[] letrasJuego = letras.LetrasJuego();
@@ -98,9 +104,10 @@ public class Jugador {
                     } else if (!existe) {
                         System.out.println("La palabra NO esta en el diccionario.");
                     } else {
-                        puntuacionLetras = puntuacionLetras + palabraUsuario.length;
-                        System.out.println("Correcta!!! Puntuacion: " + puntuacionLetras);
+                        puntosLetras = letras.puntuacionLetras(palabraUsuario, puntosLetras);
+                        System.out.println("Correcta!!! Puntuacion: " + palabraUsuario.length);
                         seguir = false;
+
                     }
 
                     // y aquí vuelve al while para que lo intente otra vez
@@ -108,11 +115,10 @@ public class Jugador {
             }
         }
 
-        return puntuacionLetras;
     }
 
-    public static int JuegoCifras() throws Exception {
-        int puntacionCifras = 0;
+    public void JuegoCifras() throws Exception  {
+        int Puntuacion = 0;
         char operacion;
         int num1;
         int num2;
@@ -130,14 +136,14 @@ public class Jugador {
 
         boolean seguir = true;
         while (seguir && numerosJugegos.length > 1) {
-
+            // pide los numeros 
             num1 = cifras.pedirNumeroValido(numerosJugegos);
 
             num2 = cifras.pedirNumeroValido(numerosJugegos);
 
             System.out.println("elije una operacion:   " + " + " + " - " + " * " + " / " + " = ");
             operacion = lt.llegirCaracter();
-
+            // si la operación no es es un igual, la resuelve y reescribe los numeros, con el resultado
             if (operacion != '=') {
                 switch (operacion) {
                     case '+':
@@ -160,6 +166,7 @@ public class Jugador {
 
                     case '*':
                         resultado = cifras.multiplicacion(num1, num2);
+
                         numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
                         reescribir(numerosJugegos);
 
@@ -167,10 +174,13 @@ public class Jugador {
 
                     case '/':
                         resultado = cifras.division(num1, num2);
+
                         if (resultado == -1) {
                             System.out.println("no se puede realizar la operacion");
 
                         } else {
+
+                            numerosJugegos = cifras.sustituir(resultado, num1, num2, numerosJugegos);
                             reescribir(numerosJugegos);
                         }
 
@@ -180,7 +190,7 @@ public class Jugador {
                         System.out.println("no es una operacion valida");
                         break;
                 }
-
+            // en caso de que sea un igual, pide que se intoduzca el resultado y se verifica 
             } else {
 
                 System.out.println("introduce el resultado:  ");
@@ -188,8 +198,9 @@ public class Jugador {
                 boolean existe = cifras.Existe(num, numerosJugegos);
 
                 if (existe) {
-                    puntacionCifras = cifras.puntuacion(num1, numInicial);
-                    System.out.println("puntuacion: " + puntacionCifras);
+                    Puntuacion = cifras.puntuacion(num1, numInicial);
+                    System.out.println("puntuacion: " + Puntuacion);
+
                     seguir = false;
 
                 } else {
@@ -200,15 +211,16 @@ public class Jugador {
             }
 
         }
+        // si solo queda un nmero, ese es el resultado 
         if (numerosJugegos.length == 1) {
             System.out.println("no hay mas numeros posibles");
             resultado = numerosJugegos[0];
             System.out.println("tu resultado es: " + resultado);
-            puntacionCifras = cifras.puntuacion(resultado, numInicial);
-            System.out.println("puntuacion: " + puntacionCifras);
+            Puntuacion = cifras.puntuacion(resultado, numInicial);
+            System.out.println("puntuacion: " + Puntuacion);
         }
-
-        return puntacionCifras;
+        
+        puntosNumeros = cifras.puntuacionNumeros(Puntuacion,puntosNumeros);
     }
 
     private static void reescribir(int[] numerosJugegos) {

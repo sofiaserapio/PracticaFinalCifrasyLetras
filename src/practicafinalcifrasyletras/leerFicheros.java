@@ -211,7 +211,7 @@ public class leerFicheros {
     return bolsaDeCifras;
 }
 
-
+// lee el fichero de estadisticas y lo muestra por pantalla 
     public static void leerEstadisticas() {
 
     FileReader estadisticas = null;
@@ -243,7 +243,7 @@ public class leerFicheros {
     }
 }
 
-
+// cuenta cuantas palabras hay en el fichero diccionario, para inicializar posteriormente un array 
    private static int contarPalabrasDiccionario() {
 
     FileReader diccionario = null;
@@ -285,7 +285,7 @@ public class leerFicheros {
     return palabras;
 }
 
-
+// copia todo el dccionario en una array 
    public static String[] diccionario() {
 
     int tamaño = contarPalabrasDiccionario();

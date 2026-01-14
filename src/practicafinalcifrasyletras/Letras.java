@@ -1,16 +1,20 @@
+/*
+clase que conrola todo lo que tenga que vercon el juego de letras 
+*/
+
+
 package practicafinalcifrasyletras;
 
 import java.util.Random;
 
 public class Letras {
 
-   
+    public static int PuntuacionLetras = 0;
     static leerFicheros lf = new leerFicheros();
     static Letras l = new Letras();
 
-
     // escoge diez letras aleatorias de las proporcionadas para el juego
-    public static char[] LetrasJuego() throws Exception {
+    public static char[] LetrasJuego()  {
         char[] letrasFichero = lf.ListadeLetras();
         char[] letrasJuego = new char[10];
         Random random = new Random();
@@ -24,7 +28,7 @@ public class Letras {
 
     /* mira que sea posible formar la palabra que ha introduciod el usuario con las letras 
     que se le ha proporcionado */
-    public boolean esPosible(String PalabarUsuario, char[] aux) throws Exception {
+    public boolean esPosible(String PalabarUsuario, char[] aux)  {
         // creamos dos arrays, una con las letras proporcionadas(aux)
         // y otra con la palabra del usuario 
         char[] usuario = PalabarUsuario.toCharArray();
@@ -34,8 +38,7 @@ public class Letras {
             return esPosible;
             // en caso de que no tenga mas de 10 letras, comprobamos que las letras usadas
             // se encuentran en las proporcionadas al principio del juego
-            
-            
+
         } else {
             // miramos si coincide
             for (int i = 0; i < usuario.length; i++) {
@@ -46,6 +49,7 @@ public class Letras {
                         // para que en caso de repeticion no se tachen dos letras, si solo se ha usado 1
                         esPosible = true;
                         aux[j] = '*';
+                        
 
                     }
 
@@ -59,5 +63,14 @@ public class Letras {
         }
         return esPosible;
     }
+// puntuación del juego de letras 
+    public int puntuacionLetras(char[] usuario, int puntuacion) {
+
+        puntuacion = puntuacion + usuario.length;
+
+        return puntuacion;
+    }
+
+
 
 }
