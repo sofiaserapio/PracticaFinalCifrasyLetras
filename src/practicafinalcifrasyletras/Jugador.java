@@ -14,6 +14,7 @@ public class Jugador {
     private int puntosLetras;
     private int puntosNumeros;
 
+
     public Jugador(String nombre) {
         this.nombre = nombre;
         this.puntuacion = 0;
@@ -21,6 +22,7 @@ public class Jugador {
         this.puntosNumeros = 0;
     }
 // pide el nombre 
+
     public static String nombre() {
         String nombre = "";
         char caracter;
@@ -35,6 +37,23 @@ public class Jugador {
 
         return nombre;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setPuntuacion(int puntuacion) {
+        this.puntuacion = puntuacion;
+    }
+
+    public void setPuntosLetras(int puntosLetras) {
+        this.puntosLetras = puntosLetras;
+    }
+
+    public void setPuntosNumeros(int puntosNumeros) {
+        this.puntosNumeros = puntosNumeros;
+    }
+    
 
     public String getNombre() {
         return nombre;
@@ -117,7 +136,7 @@ public class Jugador {
 
     }
 
-    public void JuegoCifras() throws Exception  {
+    public void JuegoCifras() throws Exception {
         int Puntuacion = 0;
         char operacion;
         int num1;
@@ -190,7 +209,7 @@ public class Jugador {
                         System.out.println("no es una operacion valida");
                         break;
                 }
-            // en caso de que sea un igual, pide que se intoduzca el resultado y se verifica 
+                // en caso de que sea un igual, pide que se intoduzca el resultado y se verifica 
             } else {
 
                 System.out.println("introduce el resultado:  ");
@@ -219,11 +238,11 @@ public class Jugador {
             Puntuacion = cifras.puntuacion(resultado, numInicial);
             System.out.println("puntuacion: " + Puntuacion);
         }
-        
-        puntosNumeros = cifras.puntuacionNumeros(Puntuacion,puntosNumeros);
+
+        puntosNumeros = cifras.puntuacionNumeros(Puntuacion, puntosNumeros);
     }
 
-    private static void reescribir(int[] numerosJugegos) {
+    private void reescribir(int[] numerosJugegos) {
 
         System.out.print("Numeros posibles: ");
         for (int i = 0; i < numerosJugegos.length; i++) {
@@ -233,6 +252,5 @@ public class Jugador {
         System.out.println();
 
     }
-
 
 }

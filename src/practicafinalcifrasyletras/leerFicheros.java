@@ -9,7 +9,7 @@ import java.io.IOException;
 public class leerFicheros {
 
     // lee la lista de letras proporcionada y la mete en un array para facilitar el uso
-    public static char[] ListadeLetras() {
+    public char[] ListadeLetras() {
 
         FileReader ficheroLetras = null;
         String letras = "";
@@ -43,7 +43,7 @@ public class leerFicheros {
 
     // comprueba que la palabra proporcionada por el usuario exista en el diccionario indicado
     // por el profesor
-    public static boolean existePalabra(char[] palabra) {
+    public boolean existePalabra(char[] palabra) {
 
         FileReader diccionario = null;
 
@@ -104,7 +104,7 @@ public class leerFicheros {
 
     /* cuenta los numeros que hay en la bolsa numerica proporcionada, teniendo en cuenta que cada 
     numero esta separado por espacios */
-    public static int contarNumeros() {
+    public int contarNumeros() {
 
         FileReader ficheroCifras = null;
         int contador = 0;
@@ -152,7 +152,7 @@ public class leerFicheros {
 
     /*  usando el contador del metodo anterior, creamos una array en donde cada posicion
     sera uno de los numeros de la lista que disponemos  */
-    public static int[] leerCifras() {
+    public int[] leerCifras() {
 
         int total = contarNumeros();
         int[] bolsaDeCifras = new int[total];
@@ -302,7 +302,7 @@ public class leerFicheros {
                         }
 
                         numPartida++;
-                    // imprime las estadisticas 
+                        // imprime las estadisticas 
                         System.out.println("************************************************************");
                         System.out.println();
                         System.out.println("Partida " + numPartida + " (" + fecha + "). Modo \"" + modoImprimir + "\", " + rondas + " rondas,");

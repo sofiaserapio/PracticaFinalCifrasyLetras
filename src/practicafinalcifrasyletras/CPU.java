@@ -15,10 +15,13 @@ public class CPU {
     private int puntosLetras;
     private int puntosNumeros;
     private static final int MAX = 1000;
-    private static  int intentosHechos;
+    private static int intentosHechos;
     private static int mejorValor;
     private static int mejorDiferencia;
     private static String mejorPasos;
+
+    
+
 
     public CPU(String nombre) {
         this.nombre = nombre;
@@ -53,10 +56,14 @@ public class CPU {
         System.out.println("introduce tu nombre: " + nombre);
         return nombre;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     // comprueba todas las palabras del diccionario para ver si se pueden 
     // formar con las letras proporcionadas 
-
-    private static boolean sePuedeFormar(String palabra, char[] letrasPosibles) {
+    private boolean sePuedeFormar(String palabra, char[] letrasPosibles) {
 
         char[] letras = new char[letrasPosibles.length];
         for (int i = 0; i < letrasPosibles.length; i++) {
@@ -87,7 +94,7 @@ public class CPU {
 // con las letras proporcionadas, si si se puede formar, la mete en un array
 // si no, simplemente pasa a la siguiente, y asi hasta el final 
 
-    private static String[] palabrasposibles(char[] letrasPosibles) {
+    private String[] palabrasposibles(char[] letrasPosibles) {
 
         String[] diccionario = leer.diccionario();
         String Palabra = "";
@@ -160,6 +167,7 @@ public class CPU {
 // inicializa el array dede esatdos, los estados son los numeros posibles y las operaciones realizadas para llegar a esos numeros  
 // el array tienen una capacidad maxima igual al numero de intentos que puede hacer la cpu
 // aparte inicializa el numero de pendientes a zero al finalizar 
+
     private void resolver(int[] numerosIniciales, int objetivo) {
 
         inicializarBusqueda(numerosIniciales, objetivo);
@@ -249,6 +257,7 @@ public class CPU {
 
         return nPendientes;
     }
+
     // prueba si es posible hacer la operacion y el resultado de esa operacion, para ver cual es el mas optimo
     private int probarPareja(int[] numsActuales, String pasosAcumulados, int objetivo,
             int a, int b,
@@ -256,7 +265,7 @@ public class CPU {
 
         int res;
 
-      // suma
+        // suma
         res = cifras.Suma(a, b);
         nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
                 pasosAcumulados + a + " + " + b + " = " + res + "\n",
@@ -274,7 +283,7 @@ public class CPU {
             return nPendientes;
         }
 
-      // resta 
+        // resta 
         res = cifras.resta(a, b);
         if (res != -1) {
             nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
@@ -313,10 +322,11 @@ public class CPU {
 
         return nPendientes;
     }
-   /* Gestiona todo lo que pasa cuando haces una operacion, augmenta los intentos, mira que no se haya llegado al objetivo
+
+    /* Gestiona todo lo que pasa cuando haces una operacion, augmenta los intentos, mira que no se haya llegado al objetivo
     actualiza el mejor resultado y devuelve la nueva array para que se pueda seguir operando sin repetir numeros 
     
-    */
+     */
     private int pushPendienteOperacion(int resultado, int[] numsActuales, int objetivo,
             int num1, int num2, String pasosNuevos,
             int[][] pendientesNums, String[] pendientesPasos,
@@ -335,14 +345,15 @@ public class CPU {
         if (mejorDiferencia == 0) {
             return nPendientes;
         }
-        
+
         int[] nuevosNumeros = cifras.sustituir(resultado, num1, num2, numsActuales);
-        
-        int num=meterPendiente(pendientesNums, pendientesPasos,
+
+        int num = meterPendiente(pendientesNums, pendientesPasos,
                 nPendientes, nuevosNumeros, pasosNuevos);
         return num;
     }
 // guarda los estados 
+
     private int meterPendiente(int[][] pendientesNums, String[] pendientesPasos,
             int nPendientes, int[] nums, String pasos) {
 
@@ -356,6 +367,7 @@ public class CPU {
         return nPendientes + 1;
     }
 // copia una nueva array para no manipular la original
+
     private int[] copiarArray(int[] a) {
         int[] c = new int[a.length];
         for (int i = 0; i < a.length; i++) {
@@ -364,6 +376,7 @@ public class CPU {
         return c;
     }
 // imprime los resultados obtenidos 
+
     private void imprimirResultado(int objetivo) {
 
         System.out.println("Objetivo: " + objetivo);
@@ -380,7 +393,7 @@ public class CPU {
 
     private static void actualizarMejor(int valor, int objetivo, String pasos) {
 
-        int diferencia = cifras.valorAbsoluto(valor - objetivo);  
+        int diferencia = cifras.valorAbsoluto(valor - objetivo);
 
         if (diferencia < mejorDiferencia) {
             mejorDiferencia = diferencia;

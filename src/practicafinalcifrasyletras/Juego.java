@@ -8,19 +8,46 @@ public class Juego {
     static LT lt = new LT();
     static Principal p = new Principal();
     Estadisticas e = new Estadisticas();
-    private int partidas;
 
-    public static String TipodeJuego() {
-        String tipodejuego = "";
-        int tp = p.op;
-        if (tp == 1) {
-            tipodejuego = "Vs CPU";
-        } else if (tp == 2) {
-            tipodejuego = "Vs humano";
+    public void tipoDeJuego() throws Exception {
+        String tipo;
+        System.out.println(
+                "Elige una opcion:\n"
+                + "1. Contra la CPU\n"
+                + "2. Contra otro jugador\n"
+                + "3. Volver al menu principal\n"
+        );
 
+        try {
+            int op = lt.llegirEnter();
+
+            switch (op) {
+                case 1:
+                    tipo = "VS CPU";
+                    e.setTipodejuego(tipo);
+                    contralaCpu();
+
+                    break;
+
+                case 2:
+                    tipo = "Vs humano";
+                    e.setTipodejuego(tipo);
+                    contraOtroJugador();
+
+                    break;
+
+                case 3:
+                    p.menu();
+                    break;
+
+                default:
+                    System.out.println("Opcion no valida. Intentalo de nuevo.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("No se permiten letras. Introduce una opcion numerica.");
+            return;
         }
-
-        return tipodejuego;
     }
 
 // pedimos las partidas que quieren jugar, controlando que sea un numero par positivo
@@ -44,27 +71,22 @@ public class Juego {
         return rondas;
     }
 
-    public void setPartidas(int numPartidas) {
-        this.partidas = numPartidas;
-    }
-
-    public int getPartidas() {
-        return this.partidas;
-    }
 // metodo jugador vs jugador 
-
-    public void contraOtroJugador() throws Exception {
+    private void contraOtroJugador() throws Exception {
         int inicio = p.opcion;
         System.out.println("Jugador 1");
         String nombre1 = Jugador.nombre();
-        Jugador jugador1 = new Jugador(nombre1);
+        Jugador j1 = new Jugador(nombre1);
+        e.setNombreJugador1(nombre1);
 
         System.out.println("Jugador 2");
         String nombre2 = Jugador.nombre();
-        Jugador jugador2 = new Jugador(nombre2);
+        Jugador j2 = new Jugador(nombre2);
+        e.setNombreJugador2(nombre2);
+
         int NumeroPartidas = NumeroDePartidas();
-        setPartidas(NumeroPartidas);
         int vueltas = NumeroPartidas;
+        e.setPartidas(NumeroPartidas);
 
         while (vueltas > 0) {
 
@@ -76,12 +98,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoCifras();
+                j1.JuegoCifras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                jugador2.JuegoCifras();
+                j2.JuegoCifras();
                 System.out.println();
                 vueltas--;
 
@@ -91,12 +113,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoLetras();
+                j1.JuegoLetras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                jugador2.JuegoLetras();
+                j2.JuegoLetras();
                 System.out.println();
                 vueltas--;
 
@@ -108,12 +130,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoLetras();
+                j1.JuegoLetras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                jugador2.JuegoLetras();
+                j2.JuegoLetras();
 
                 vueltas--;
                 System.out.println("ronda de cifras");
@@ -121,43 +143,47 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoCifras();
+                j1.JuegoCifras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                jugador2.JuegoCifras();
+                j2.JuegoCifras();
                 vueltas--;
             }
 
         }
 
         // Calcular puntuaciones finales 
-        jugador1.Calcularapuntuacion();
-        jugador2.Calcularapuntuacion();
+        j1.Calcularapuntuacion();
+        j2.Calcularapuntuacion();
 
         // Mostrar ganador
-        ganador(jugador1, jugador2);
+        ganador(j1, j2);
         System.out.println();
         System.out.println();
         System.out.println();
-        e.guardarPartidaVsJugador(jugador1, jugador2, getPartidas());
+        e.guardarPartida();
         p.menu();
     }
 // metodo jugador vs cpu
 
-    public void contralaCpu() throws Exception {
+    private void contralaCpu() throws Exception {
+
         int inicio = p.opcion;
         System.out.println("Jugador 1");
         String nombre1 = Jugador.nombre();
-        Jugador jugador1 = new Jugador(nombre1);
+        Jugador j1 = new Jugador(nombre1);
+        e.setNombreJugador1(nombre1);
 
         System.out.println("Jugador 2");
         String nombre2 = CPU.nombre();
-        CPU cpu = new CPU(nombre2);
+        CPU c = new CPU(nombre2);
+        e.setNombreJugador2(nombre2);
+
         int rondas = NumeroDePartidas();
-        setPartidas(rondas);
         int vueltas = rondas;
+        e.setPartidas(rondas);
         while (vueltas > 0) {
 
             if (inicio == 1) {
@@ -169,12 +195,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoCifras();
+                j1.JuegoCifras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                cpu.Numeros();
+                c.Numeros();
                 vueltas--;
 
                 System.out.println(rondas);
@@ -185,12 +211,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoLetras();
+                j1.JuegoLetras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                cpu.Letras();
+                c.Letras();
                 vueltas--;
 
             } else {
@@ -201,12 +227,12 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoLetras();
+                j1.JuegoLetras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                cpu.Letras();
+                c.Letras();
 
                 vueltas--;
                 System.out.println("ronda de cifras");
@@ -214,26 +240,26 @@ public class Juego {
                 System.out.print("turno de " + nombre1);
                 System.out.println();
 
-                jugador1.JuegoCifras();
+                j1.JuegoCifras();
 
                 System.out.print("turno de " + nombre2);
                 System.out.println();
 
-                cpu.Numeros();
+                c.Numeros();
 
                 vueltas--;
             }
 
         }
 
-        cpu.CalcularapuntuacionCPU();
-        jugador1.Calcularapuntuacion();
+        c.CalcularapuntuacionCPU();
+        j1.Calcularapuntuacion();
 
-        ganadorcpu(jugador1, cpu);
+        ganadorcpu(j1, c);
         System.out.println();
         System.out.println();
         System.out.println();
-        e.guardarPartidaVsCPU(jugador1, cpu, getPartidas());
+        e.guardarPartida();
         p.menu();
     }
 // miramos al ganador entre dos jugadores 
@@ -241,7 +267,9 @@ public class Juego {
     private void ganador(Jugador j1, Jugador j2) {
 
         int puntos1 = j1.getPuntuacion();
+        e.setPuntuacion1(puntos1);
         int puntos2 = j2.getPuntuacion();
+        e.setPuntuacion2(puntos2);
 
         System.out.println("Resultado final:");
         System.out.println(j1.getNombre() + ": " + puntos1 + " puntos");
@@ -260,7 +288,9 @@ public class Juego {
     private void ganadorcpu(Jugador j1, CPU cp) {
 
         int puntos1 = j1.getPuntuacion();
+        e.setPuntuacion1(puntos1);
         int puntos2 = cp.getPuntuacionCPU();
+        e.setPuntuacion2(puntos2);
 
         System.out.println("Resultado final:");
         System.out.println(j1.getNombre() + ": " + puntos1 + " puntos");
