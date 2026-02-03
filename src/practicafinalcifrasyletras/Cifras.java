@@ -37,7 +37,7 @@ public class Cifras {
     }
 // pedir los numeros por pantalla 
 
-    public static int pedirNumeroValido(int[] numerosJuegos) {
+    public int pedirNumeroValido(int[] numerosJuegos) {
 
         int numero = 0;
         boolean valido = false;
@@ -46,7 +46,7 @@ public class Cifras {
 
             System.out.println("Introduce un numero: ");
 
-            // Si no es '=', debe ser un número
+           
             try {
                 numero = lt.llegirEnter();
 
@@ -103,7 +103,7 @@ public class Cifras {
     }
 // sustituimos el resultado y elimimamos los numeros utilizados 
 
-    public static int[] sustituir(int resultado, int num1, int num2, int[] num) {
+    public int[] sustituir(int resultado, int num1, int num2, int[] num) {
         int[] nuevo = new int[num.length - 1];
         int indiceNuevo = 0;
         boolean eliminadoA = false;

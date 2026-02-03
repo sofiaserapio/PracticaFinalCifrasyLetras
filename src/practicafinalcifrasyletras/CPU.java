@@ -5,11 +5,8 @@ en cambio en el de letras, se escoge de forma aleatoria una de las palabras que 
  */
 package practicafinalcifrasyletras;
 
-import java.util.Random;
-
 public class CPU {
 
-    static LT lt = new LT();
     static Cifras cifras = new Cifras();
     static Letras letras = new Letras();
     static leerFicheros leer = new leerFicheros();
@@ -17,8 +14,8 @@ public class CPU {
     private int puntuacion;
     private int puntosLetras;
     private int puntosNumeros;
-    private int max = 1000;
-    private static int intentosHechos;
+    private static final int MAX = 1000;
+    private static  int intentosHechos;
     private static int mejorValor;
     private static int mejorDiferencia;
     private static String mejorPasos;
@@ -116,21 +113,32 @@ public class CPU {
 
         return posibles;
     }
-//de el array de palabras posibles, elegimos una al azar 
+//de el array de palabras posibles, elegimos la mas larga
 
-    private String palabraEscogida(String[] Palabras) {
-        Random random = new Random();
-        int posicion = random.nextInt(0, Palabras.length);
-        String palabra = Palabras[posicion];
+    private String palabraEscogida(String[] palabras) {
 
-        return palabra;
+        String mejor = palabras[0];
+
+        for (int i = 1; i < palabras.length; i++) {
+
+            String actual = palabras[i];
+
+            char[] mejorChars = mejor.toCharArray();
+            char[] actualChars = actual.toCharArray();
+
+            if (actualChars.length > mejorChars.length) {
+                mejor = actual;
+            }
+        }
+
+        return mejor;
     }
-// el juego de letras 
 
+// el juego de letras 
     public void Letras() {
         char[] letrasJuego = letras.LetrasJuego();
 
-        // Mostrar letras (porque imprimir char[] directamente no queda bien)
+        // Mostrar letras 
         System.out.print("Letras posibles: ");
         for (int i = 0; i < letrasJuego.length; i++) {
             System.out.print(letrasJuego[i] + " ");
@@ -149,9 +157,40 @@ public class CPU {
         System.out.println("puntuacion CPU:  " + palabraFinal.length);
 
     }
-// imprime la solucion escogida, los pasos y la puntuación 
+// inicializa el array dede esatdos, los estados son los numeros posibles y las operaciones realizadas para llegar a esos numeros  
+// el array tienen una capacidad maxima igual al numero de intentos que puede hacer la cpu
+// aparte inicializa el numero de pendientes a zero al finalizar 
+    private void resolver(int[] numerosIniciales, int objetivo) {
 
-    private void resolverConBacktracking(int[] numerosIniciales, int objetivo) {
+        inicializarBusqueda(numerosIniciales, objetivo);
+
+        int capacidad = MAX; // número máximo de estados
+        int[][] pendientesNums = new int[capacidad][];
+        String[] pendientesPasos = new String[capacidad];
+
+        int nPendientes = 0;
+
+        // estado inicial
+        nPendientes = meterPendiente(pendientesNums, pendientesPasos, nPendientes,
+                copiarArray(numerosIniciales), "");
+
+        // búsqueda iterativa
+        while (nPendientes > 0 && !deboParar()) {
+
+            // sacamos el último (profundidad)
+            nPendientes--;
+            int[] numsActuales = pendientesNums[nPendientes];
+            String pasosAcumulados = pendientesPasos[nPendientes];
+
+            nPendientes = procesarEstado(numsActuales, pasosAcumulados, objetivo,
+                    pendientesNums, pendientesPasos, nPendientes);
+        }
+
+        imprimirResultado(objetivo);
+    }
+
+// inicializa los intentos y busca, de los numeros posibles el que mas se acerque al objetivo 
+    private void inicializarBusqueda(int[] numerosIniciales, int objetivo) {
 
         intentosHechos = 0;
 
@@ -162,8 +201,170 @@ public class CPU {
         for (int i = 0; i < numerosIniciales.length; i++) {
             actualizarMejor(numerosIniciales[i], objetivo, "");
         }
+    }
+// mira si ya ha llegado al objetivo o a los intentos maximos 
 
-        backtracking(numerosIniciales, objetivo, "");
+    private boolean deboParar() {
+        return mejorDiferencia == 0 || intentosHechos >= MAX;
+    }
+
+
+    /* encargado de trabajar con un estado del juego.Recibe los números que puede usar y
+    Comprueba si alguno de ellos se acerca más al objetivo, aparte 
+    prueba todas las combinaciones posibles de dos números y opera con ellos.
+     */
+    private int procesarEstado(int[] numsActuales, String pasosAcumulados, int objetivo,
+            int[][] pendientesNums, String[] pendientesPasos, int nPendientes) {
+
+        if (numsActuales.length < 2) {
+            return nPendientes;
+        }
+
+        // actualizar mejor con números actuales
+        for (int i = 0; i < numsActuales.length; i++) {
+            actualizarMejor(numsActuales[i], objetivo, pasosAcumulados);
+            if (mejorDiferencia == 0) {
+                return nPendientes;
+            }
+        }
+
+        for (int i = 0; i < numsActuales.length; i++) {
+            for (int j = i + 1; j < numsActuales.length; j++) {
+
+                if (deboParar()) {
+                    return nPendientes;
+                }
+
+                int a = numsActuales[i];
+                int b = numsActuales[j];
+
+                nPendientes = probarPareja(numsActuales, pasosAcumulados, objetivo,
+                        a, b, pendientesNums, pendientesPasos, nPendientes);
+
+                if (nPendientes >= pendientesNums.length) {
+                    return pendientesNums.length;
+                }
+            }
+        }
+
+        return nPendientes;
+    }
+    // prueba si es posible hacer la operacion y el resultado de esa operacion, para ver cual es el mas optimo
+    private int probarPareja(int[] numsActuales, String pasosAcumulados, int objetivo,
+            int a, int b,
+            int[][] pendientesNums, String[] pendientesPasos, int nPendientes) {
+
+        int res;
+
+      // suma
+        res = cifras.Suma(a, b);
+        nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
+                pasosAcumulados + a + " + " + b + " = " + res + "\n",
+                pendientesNums, pendientesPasos, nPendientes);
+        if (deboParar()) {
+            return nPendientes;
+        }
+
+        // multiplicacion
+        res = cifras.multiplicacion(a, b);
+        nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
+                pasosAcumulados + a + " * " + b + " = " + res + "\n",
+                pendientesNums, pendientesPasos, nPendientes);
+        if (deboParar()) {
+            return nPendientes;
+        }
+
+      // resta 
+        res = cifras.resta(a, b);
+        if (res != -1) {
+            nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
+                    pasosAcumulados + a + " - " + b + " = " + res + "\n",
+                    pendientesNums, pendientesPasos, nPendientes);
+            // si restando a-b da negativo prueba arestar b-a
+        } else {
+            res = cifras.resta(b, a);
+            if (res != -1) {
+                nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, b, a,
+                        pasosAcumulados + b + " - " + a + " = " + res + "\n",
+                        pendientesNums, pendientesPasos, nPendientes);
+            }
+        }
+        if (deboParar()) {
+            return nPendientes;
+        }
+
+        // divison 
+        res = cifras.division(a, b);
+        if (res != -1) {
+            nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, a, b,
+                    pasosAcumulados + a + " / " + b + " = " + res + "\n",
+                    pendientesNums, pendientesPasos, nPendientes);
+        }
+        if (deboParar()) {
+            return nPendientes;
+        }
+        // si a/b no da exacto prueba b/a 
+        res = cifras.division(b, a);
+        if (res != -1) {
+            nPendientes = pushPendienteOperacion(res, numsActuales, objetivo, b, a,
+                    pasosAcumulados + b + " / " + a + " = " + res + "\n",
+                    pendientesNums, pendientesPasos, nPendientes);
+        }
+
+        return nPendientes;
+    }
+   /* Gestiona todo lo que pasa cuando haces una operacion, augmenta los intentos, mira que no se haya llegado al objetivo
+    actualiza el mejor resultado y devuelve la nueva array para que se pueda seguir operando sin repetir numeros 
+    
+    */
+    private int pushPendienteOperacion(int resultado, int[] numsActuales, int objetivo,
+            int num1, int num2, String pasosNuevos,
+            int[][] pendientesNums, String[] pendientesPasos,
+            int nPendientes) {
+
+        if (intentosHechos >= MAX) {
+            return nPendientes;
+        }
+        intentosHechos++;
+
+        if (resultado == -1) {
+            return nPendientes;
+        }
+
+        actualizarMejor(resultado, objetivo, pasosNuevos);
+        if (mejorDiferencia == 0) {
+            return nPendientes;
+        }
+        
+        int[] nuevosNumeros = cifras.sustituir(resultado, num1, num2, numsActuales);
+        
+        int num=meterPendiente(pendientesNums, pendientesPasos,
+                nPendientes, nuevosNumeros, pasosNuevos);
+        return num;
+    }
+// guarda los estados 
+    private int meterPendiente(int[][] pendientesNums, String[] pendientesPasos,
+            int nPendientes, int[] nums, String pasos) {
+
+        if (nPendientes >= pendientesNums.length) {
+            return nPendientes;
+        }
+
+        pendientesNums[nPendientes] = nums;
+        pendientesPasos[nPendientes] = pasos;
+
+        return nPendientes + 1;
+    }
+// copia una nueva array para no manipular la original
+    private int[] copiarArray(int[] a) {
+        int[] c = new int[a.length];
+        for (int i = 0; i < a.length; i++) {
+            c[i] = a[i];
+        }
+        return c;
+    }
+// imprime los resultados obtenidos 
+    private void imprimirResultado(int objetivo) {
 
         System.out.println("Objetivo: " + objetivo);
         System.out.println("Mejor resultado CPU: " + mejorValor
@@ -175,108 +376,11 @@ public class CPU {
 
         puntosNumeros = cifras.puntuacionNumeros(puntos, puntosNumeros);
     }
-//  escoge dos numeros del array de numeros proporcionado y hace todas las operaciones 
-
-    private void backtracking(int[] numsActuales, int objetivo, String pasosAcumulados) {
-
-        if (mejorDiferencia == 0) {
-            return;
-        }
-        if (numsActuales.length < 2) {
-            return;
-        }
-
-        // Actualizar mejor con los valores actuales
-        for (int i = 0; i < numsActuales.length; i++) {
-            actualizarMejor(numsActuales[i], objetivo, pasosAcumulados);
-            if (mejorDiferencia == 0) {
-                return;
-            }
-        }
-
-        for (int i = 0; i < numsActuales.length; i++) {
-            for (int j = i + 1; j < numsActuales.length; j++) {
-
-                int a = numsActuales[i];
-                int b = numsActuales[j];
-
-                probarSuma(numsActuales, objetivo, pasosAcumulados, a, b);
-                probarMultiplicacion(numsActuales, objetivo, pasosAcumulados, a, b);
-                probarResta(numsActuales, objetivo, pasosAcumulados, a, b);
-                probarDivision(numsActuales, objetivo, pasosAcumulados, a, b);
-
-                if (mejorDiferencia == 0) {
-                    return;
-                }
-            }
-        }
-    }
-// operaciones posibles 
-
-    private void probarSuma(int[] nums, int objetivo, String pasos, int a, int b) {
-        int res = cifras.Suma(a, b);
-        probarOperacion(nums, objetivo, a, b, res,
-                pasos + a + " + " + b + " = " + res + "\n");
-    }
-
-    private void probarMultiplicacion(int[] nums, int objetivo, String pasos, int a, int b) {
-        int res = cifras.multiplicacion(a, b);
-        probarOperacion(nums, objetivo, a, b, res,
-                pasos + a + " * " + b + " = " + res + "\n");
-    }
-
-    private void probarResta(int[] nums, int objetivo, String pasos, int a, int b) {
-        int res = cifras.resta(a, b);
-        if (res != -1) {
-            probarOperacion(nums, objetivo, a, b, res,
-                    pasos + a + " - " + b + " = " + res + "\n");
-        } else {
-            res = cifras.resta(b, a);
-            if (res != -1) {
-                probarOperacion(nums, objetivo, b, a, res,
-                        pasos + b + " - " + a + " = " + res + "\n");
-            }
-        }
-    }
-
-    private void probarDivision(int[] nums, int objetivo, String pasos, int a, int b) {
-        int res = cifras.division(a, b);
-        if (res != -1) {
-            probarOperacion(nums, objetivo, a, b, res,
-                    pasos + a + " / " + b + " = " + res + "\n");
-        }
-
-        res = cifras.division(b, a);
-        if (res != -1) {
-            probarOperacion(nums, objetivo, b, a, res,
-                    pasos + b + " / " + a + " = " + res + "\n");
-        }
-    }
-// compara todos los resultados y se queda con el mejor 
-
-    private void probarOperacion(int[] numsActuales, int objetivo,
-            int num1, int num2, int resultado,
-            String pasosNuevos) {
-
-        if (intentosHechos >= max) {
-            return;
-        }
-        intentosHechos++;
-
-        actualizarMejor(resultado, objetivo, pasosNuevos);
-        if (mejorDiferencia == 0) {
-            return;
-        }
-
-        int[] nuevosNumeros = cifras.sustituir(resultado, num1, num2, numsActuales);
-
-        backtracking(nuevosNumeros, objetivo, pasosNuevos);
-    }
 // mira quie resultado se aleja menos del objetivo 
 
     private static void actualizarMejor(int valor, int objetivo, String pasos) {
 
-        int diferencia = cifras.valorAbsoluto(valor - objetivo);  // <- IMPORTANTE: usar "valor", no "mejorValor"
+        int diferencia = cifras.valorAbsoluto(valor - objetivo);  
 
         if (diferencia < mejorDiferencia) {
             mejorDiferencia = diferencia;
@@ -299,7 +403,7 @@ public class CPU {
         }
         System.out.println();
 
-        resolverConBacktracking(numerosJugegos, numInicial);
+        resolver(numerosJugegos, numInicial);
 
     }
 
